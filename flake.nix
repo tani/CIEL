@@ -101,8 +101,8 @@
           version =
             let
               asd = builtins.readFile ./ciel.asd;
-              res = builtins.match ''.*:version[[:space:]]*"([^"]*)".*'' asd;
-              ver = builtins.elemAt res 0;
+              res = builtins.split '':version[[:space:]]*"([^"]*)"'' asd;
+              ver = builtins.elemAt (builtins.elemAt res 1) 0;
             in
               "${ver}-git";
           cl-json-pointer-synonyms = lisp.buildASDFSystem {
