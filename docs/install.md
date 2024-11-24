@@ -19,7 +19,7 @@ To download a CIEL binary:
   <https://gitlab.com/vindarel/ciel/-/pipelines>, download the latest
   artifacts, unzip the `ciel-v0-{platform}.zip` archive and run `ciel-v0-{platform}/ciel`.
 - if you use the [Guix](https://guix.gnu.org/) package manager, install package `sbcl-ciel-repl`.
-- if you use the [Nix](https://nixos.org/) package manager, install package `ciel` and `ciel` in SBCL.
+- if you use the [Nix](https://nixos.org/) package manager in Linux and macOS, install package `ciel` and `ciel` in SBCL.
 
 CIEL is currently built for the following platforms:
 
