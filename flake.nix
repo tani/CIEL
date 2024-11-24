@@ -154,7 +154,7 @@
             exec ${lisp'}/bin/${lisp'.meta.mainProgram} --noinform \
               --core '${ciel-repl-image}/ciel' \
               --eval '(ciel::main)' \
-              -- "$@"
+              "$@"
           '';
         in {
           overlayAttrs = {
