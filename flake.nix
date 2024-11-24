@@ -15,10 +15,12 @@
         let
           ### Package Information ###
           src = ./.;
+          pygments = pkgs.python312Packages.pygments;
           nativeLibs = with pkgs;
             [
               asdf
               zstd
+              pygments
             ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
               inotify-tools
             ];
@@ -132,6 +134,7 @@
             pname = "ciel-repl";
             inherit version src;
             nativeBuildInputs = [ lisp' pkgs.asdf ];
+            buildInputs = [ pygments ];
             buildPhase = "# no build phase";
             installPhase = ''
               mkdir -p $out
@@ -140,6 +143,8 @@
                 (load (sb-ext:posix-getenv "ASDF"))
                 (asdf:load-system :ciel)
                 (asdf:load-system :ciel/repl)
+                (setf sbcli:*syntax-highlighting* t)
+                (setf sbcli::*pygmentize* "${pygments}/bin/pygmentize")
                 (uiop:dump-image "$out/ciel")
               EOF
             '';
