@@ -142,40 +142,33 @@ You can use CIEL with home-manager by adding the CIEL repository to your `home.n
 2. Add the CIEL overlay to your Nixpkgs overlay list.
 3. Add CIEL to your `home.packages` list.
 
-```nix
+```diff
 # flake.nix
 inputs = {
-  # ...
-  # Add the CIEL repository
-  ciel.url = "github:ciel-lang/CIEL";
-  ciel.inputs.nixpkgs.follows = "nixpkgs";
++  # Add the CIEL repository
++  ciel.url = "github:ciel-lang/CIEL";
++  ciel.inputs.nixpkgs.follows = "nixpkgs";
 };
-# ...
-outputs = { self, ciel, nixpkgs }:
-# ...
-home-manager.lib.homeManagerConfiguration {
-  pkgs = import nixpkgs {
-    inherit system;
-    overlays = [
-      # Add the CIEL overlay
-      ciel.overlays.default
-    ];
-  };
-  # ...
-};
-# ...
+outputs = { self, ciel, nixpkgs, ... }:
+  flake-utils.lib.eachDefaultSystem (system: {
+  legacyPackages.homeConfigurations."USERNAME" = home-manager.lib.homeManagerConfiguration {
+    pkgs = import nixpkgs {
+      inherit system;
+      overlays = [
++        # Add the CIEL overlay
++        ciel.overlays.default
+      ];
+    };
 ```
 
-```nix
+```diff
 # home.nix
-# ...
 packages = with pkgs; [
-  # Use CIEL command line interface
-  ciel
-  # Use CIEL as a library
-  sbcl.withPackages (ps: [ ps.ciel ]);
++  # Use CIEL command line interface
++  ciel
++  # Use CIEL as a library
++  sbcl.withPackages (ps: [ ps.ciel ]);
 ];
-# ...
 ```
 
 #### Install CIEL to your devShell
@@ -186,37 +179,32 @@ You need to modify your `flake.nix` file to include CIEL in your development env
 2. Add the CIEL overlay to your Nixpkgs overlay list.
 3. Add CIEL to your `devShell` packages or any other package set.
 
-```nix
+```diff
 {
   inputs = {
-    # ...
-    # Add the CIEL repository
-    ciel.url = "github:ciel-lang/CIEL";
-    ciel.inputs.nixpkgs.follows = "nixpkgs";
++    # Add the CIEL repository
++    ciel.url = "github:ciel-lang/CIEL";
++    ciel.inputs.nixpkgs.follows = "nixpkgs";
   };
   outputs = { self, ciel, nixpkgs }:
     let
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
-          # ...
-          # Add the CIEL overlay
-          ciel.overlays.default
++          # Add the CIEL overlay
++          ciel.overlays.default
         ];
       };
     in
     {
-      # ...
       devShell = nixpkgs.mkShell {
         packages = with pkgs; [
-          # ...
-          # Use CIEL command line interface
-          ciel
-          # Use CIEL as a library
-          sbcl.withPackages (ps: [ ps.ciel ]);
++          # Use CIEL command line interface
++          ciel
++          # Use CIEL as a library
++          sbcl.withPackages (ps: [ ps.ciel ]);
         ];
       };
-      # ...
     };
 }
 ```
