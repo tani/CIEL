@@ -21,26 +21,17 @@
                :alexandria
                :arrow-macros
 
-               ;; Those are two dependencies that we like,
-               ;; but that depend on osicat, hence complicate deployment of binaries.
-               ;; check with (ql:who-depends-on "osicat")
-               ;; Maybe create a sub-system with them.
+               ;; Previously, we had dependencies that depended on Osicat (fof, moira),
+               ;; hence complicating deployment of binaries.
+               ;; Check with (ql:who-depends-on "osicat") and ditch Osicat.
                ;;
-               ;; :fof  ;; concise file-object finder
-               ;; lightweight fork, not in Quicklisp as of <2024-08-30>:
-               :file-finder
-               ;; :moira  ;; monitor and restart background threads.
-               ;; This system doesn't depend on Osicat:
-               :moira/light  ;; since <2023-11-23 Thu> and still not in Quicklisp…
-               ;;
-               ;; see
-               ;; https://gitlab.com/ambrevar/fof/-/issues/6
-               ;; https://github.com/ruricolist/moira/issues/1
+               :file-finder  ;; file-object finder
 
                ;; threads
                :bordeaux-threads
                :trivial-monitored-thread
                :lparallel
+               :moira/light  ;; monitor background threads
                :cl-cron
 
                :closer-mop
@@ -142,6 +133,8 @@
                :serapeum
                :shlex
 
+               :function-cache  ;; memoization
+
                ;; tests
                :fiveam
 
@@ -159,7 +152,6 @@
                ;;; ;TODO: we don't want these dependencies when we build a binary.
                ;;;
                :named-readtables
-               :clesh  ;; shell pass-through
                :quicksearch  ;; search on GitHub, Cliki, Quickdocs.
                )
   :components ((:module "src"
@@ -187,7 +179,6 @@
   :components ((:file "repl")
                (:file "utils")
                (:file "scripting")
-               (:file "shell-utils")
                (:file "repl-utils")
 
                ;; I define them here, for good practice (for me),
@@ -207,3 +198,9 @@
 ;;; This defines ciel.asd. It is enough to quickload CIEL.
 ;;; But to build a binary,
 ;;; see build-config.lisp for extra config.
+
+;; build a smaller executable with SBCL's core compression:
+;; from 119MB to 28MB, however startup time increases from 0.02 to 0.35s (noticeable).
+#+sb-core-compression
+(defmethod asdf:perform ((o asdf:image-op) (c asdf:system))
+  (uiop:dump-image (asdf:output-file o c) :executable t :compression t))
