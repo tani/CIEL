@@ -15,20 +15,6 @@
     };
     date = "2022-09-14";
   };
-  lparallel = {
-    pname = "lparallel";
-    version = "70225f4b234d5765cd833d4b9a3c094976540c49";
-    src = fetchgit {
-      url = "https://github.com/sharplispers/lparallel";
-      rev = "70225f4b234d5765cd833d4b9a3c094976540c49";
-      fetchSubmodules = false;
-      deepClone = false;
-      leaveDotGit = false;
-      sparseCheckout = [ ];
-      sha256 = "sha256-lpkMM5W+1JABgjfoFXgOmmQhCyS9y8MMdPPMIKaLvfQ=";
-    };
-    date = "2025-05-14";
-  };
   termp = {
     pname = "termp";
     version = "29789fe83db624679b6f341e3fae3f2577ce6a45";

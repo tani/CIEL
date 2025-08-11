@@ -19,26 +19,6 @@
         },
         "version": "f6760e2a02972783f96b92a15f801e14a6828e0c"
     },
-    "lparallel": {
-        "cargoLocks": null,
-        "date": "2025-05-14",
-        "extract": null,
-        "name": "lparallel",
-        "passthru": null,
-        "pinned": false,
-        "src": {
-            "deepClone": false,
-            "fetchSubmodules": false,
-            "leaveDotGit": false,
-            "name": null,
-            "rev": "70225f4b234d5765cd833d4b9a3c094976540c49",
-            "sha256": "sha256-lpkMM5W+1JABgjfoFXgOmmQhCyS9y8MMdPPMIKaLvfQ=",
-            "sparseCheckout": [],
-            "type": "git",
-            "url": "https://github.com/sharplispers/lparallel"
-        },
-        "version": "70225f4b234d5765cd833d4b9a3c094976540c49"
-    },
     "termp": {
         "cargoLocks": null,
         "date": "2024-09-02",

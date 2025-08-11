@@ -1,8 +1,8 @@
 ;; #!/usr/bin/sbcl --script
-(ignore-errors (load "~/quicklisp/setup"))
-#+quicklisp
-(let ((*standard-output* (make-broadcast-stream)))
-  (ql:quickload "cl-readline"))
+(load "~/quicklisp/setup")
+
+(ql:quickload "cl-readline" :silent t)
+
 ;; update <2024-09-04>: now all shell commands are run interactively.
 ;;; It works for htop, vim, sudo, emacs -nw…
 ;;;
@@ -221,8 +221,8 @@
      ("q" . (0 . ,#'end))
      ;; ("z" . (0 . ,#'reset))
      ("lisp-critic" . (0 . ,#'toggle-lisp-critic))
-     ("edit" . (1 . ,#'edit-and-load-file))
-     )
+     ("edit" . (1 . ,#'edit-and-load-file)))
+     
    :test 'equal)
   "All special commands starting with :")
 
@@ -247,9 +247,9 @@
     (cond
       ((= -1 l) (funcall fun (str:join " " args)))
       ((< rl l)
-        (format *error-output*
-                "Expected ~a arguments to ~a, but got ~a!~%"
-                l call rl))
+       (format *error-output*
+               "Expected ~a arguments to ~a, but got ~a!~%"
+               l call rl))
       (t (apply fun (subseq args 0 l))))))
 
 (defun handle-special-input (text)
@@ -446,15 +446,15 @@ strings to match candidates against (for example in the form \"package:sym\")."
   (declare (ignore end))
   (and (not (shell-passthrough-p text))
        (> start 1)  ;; 1 is an opening parenthesis.
-       (char-equal #\" (elt line-buffer (1- start))) ;; after an opening quote.
-       ))
+       (char-equal #\" (elt line-buffer (1- start))))) ;; after an opening quote.
+       
 
 #+test-ciel
 (progn
   (assert (complete-filename-p "test" 7 10 :line-buffer "(load \"test"))
   (assert (complete-filename-p "test" 7 10 :line-buffer "(!foo \"test"))
-  (assert (not (complete-filename-p "test" 1 5 :line-buffer "\"test")))
-  )
+  (assert (not (complete-filename-p "test" 1 5 :line-buffer "\"test"))))
+  
 
 (defun filter-candidates (text file-candidates)
   "Return a list of files (strings) in the current directory that start with TEXT."
@@ -615,8 +615,8 @@ strings to match candidates against (for example in the form \"package:sym\")."
     (uiop:format! t "text is: ~a~&" (str:from-file filename))
     ;; (rl:insert-text (str:concat "hello" (str:trim (str:from-file filename))))
     (setf rl:*line-buffer* (str:trim (str:from-file filename)))
-    (rl:redisplay)
-    ))
+    (rl:redisplay)))
+    
 
 (defun repl (&key noinform no-usernit)
   "Toplevel REPL.

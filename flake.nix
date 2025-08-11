@@ -31,7 +31,7 @@
           # Native libraries required by CIEL and its dependencies
           nativeLibs = with pkgs;
             [
-              asdf        # ASDF build system
+              asdf
               zstd        # Compression library
               pkgs.python312Packages.pygments    # Syntax highlighting
             ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
@@ -44,13 +44,6 @@
           sources = pkgs.callPackage ./_sources/generated.nix { };
           # Custom build for cl-json-pointer with synonyms system
           # Source managed by nvfetcher (not in Quicklisp)
-          _lparallel = lisp.buildASDFSystem {
-            pname = "lparallel";
-            version = sources.cl-json-pointer.version;
-            systems = [ "lparallel" ];
-            src = sources.lparallel.src;
-            lispLibs = with lisp.pkgs; [ alexandria atomics bordeaux-threads trivial-cltl2 ];
-          };
           _cl-json-pointer-synonyms = lisp.buildASDFSystem {
             pname = "cl-json-pointer";
             version = sources.cl-json-pointer.version;
@@ -78,10 +71,9 @@
             moira
             bordeaux-threads
             trivial-monitored-thread
-            _lparallel
+            lparallel
             cl-cron
             closer-mop
-            cl-ansi-text
             cl-csv
             shasht
             _cl-json-pointer-synonyms
@@ -108,8 +100,8 @@
             str
             secret-values
             progressons
-            termp
-           pythonic-string-reader
+            _termp
+            pythonic-string-reader
             trivia
             trivial-arguments
             trivial-package-local-nicknames
@@ -150,109 +142,33 @@
             systems = [ "ciel" "ciel/repl" ]; # Both library and REPL systems
           };
           # SBCL with CIEL package available
-          lisp' = lisp.withPackages (ps: with ps; [
-            cl-reexport
-            cl-ansi-text
-            access
-            alexandria
-            arrow-macros
-            file-finder
-            moira
-            bordeaux-threads
-            trivial-monitored-thread
-            lparallel
-            # cl-cron
-            closer-mop
-            # cl-csv
-            # shasht
-            _cl-json-pointer-synonyms
-            # dissect
-            # fset
-            # file-notify
-            # generic-cl
-            # dexador
-            # hunchentoot
-            # easy-routes
-            # quri
-            # lquery
-            # spinneret
-            # cl-ftp
-            # clingon
-            # local-time
-            # modf
-            # parse-float
-            # parse-number
-            # dbi
-            # sxql
-            # vgplot
-            # cl-ppcre
-            # str
-            # secret-values
-            # progressons
-            # _termp
-            # pythonic-string-reader
-            # trivia
-            # trivial-arguments
-            # trivial-package-local-nicknames
-            # trivial-types
-            # metabang-bind
-            # defstar
-            # for
-            # trivial-do
-            # cmd
-            # serapeum
-            # shlex
-            # function-cache
-            # fiveam
-            # which
-            # log4cl
-            # printv
-            # repl-utilities
-            # named-readtables
-            # clesh
-            # quicksearch
-            # cl-readline
-            # lisp-critic
-            # magic-ed
-          ]);
+          lisp' = lisp.withPackages (ps: [ ciel ]);
           # Pre-built CIEL REPL image for faster startup
-          ciel-repl-image = pkgs.stdenv.mkDerivation {
-            pname = "ciel-repl";
-            inherit version src;
-            nativeBuildInputs = [ lisp' pkgs.asdf ];
-            buildInputs = [ pygments ];
-            buildPhase = "# no build phase";
-            # Create SBCL image with CIEL preloaded for faster startup
-            installPhase = ''
-              mkdir -p $out
-              export LD_LIBRARY_PATH=${lib.makeLibraryPath nativeLibs}
-              ${lisp'}/bin/${lisp'.meta.mainProgram} --noinform <<EOF
-                (load (sb-ext:posix-getenv "ASDF"))
-                (asdf:load-system :ciel)
-                (asdf:load-system :ciel/repl)
-                (setf sbcli:*syntax-highlighting* t)
-                (setf sbcli::*pygmentize* "${pygments}/bin/pygmentize")
-                (uiop:dump-image "$out/ciel")
-              EOF
-            '';
-          };
+          ciel-repl-src = pkgs.writeText "ciel.lisp" ''
+            (load (sb-ext:posix-getenv "ASDF"))
+            (asdf:load-system :ciel)
+            (asdf:load-system :ciel/repl)
+            (setf sbcli:*syntax-highlighting* t)
+            (setf sbcli::*pygmentize* "${pygments}/bin/pygmentize")
+            (sbcli:repl)
+          '';
+          ciel-repl-bin = pkgs.writeShellScriptBin "ciel" ''
+            export LD_LIBRARY_PATH=${lib.makeLibraryPath nativeLibs}
+            ${lisp'}/bin/sbcl --script ${ciel-repl-src}
+          '';
         in {
           # Overlay for making CIEL available in other flakes
           overlayAttrs = {
             sbcl = pkgs.sbcl.withOverrides (self: super: { inherit ciel; });
-            ciel = ciel-repl-image;
+            ciel = ciel-repl-bin;
           };
           # Default app: run CIEL REPL with `nix run`
           apps.default = {
             type = "app";
-            program = ciel-repl-image;
-          };
-          apps.sbcl = {
-            type = "app";
-            program = lisp';
+            program = ciel-repl-bin;
           };
           # Development shell: `nix develop` provides CIEL and SBCL
-          devShells.default = pkgs.mkShell { packages = [ lisp' ]; };
+          devShells.default = pkgs.mkShell { packages = [ lisp' ciel-repl-bin ]; };
         };
     };
 }

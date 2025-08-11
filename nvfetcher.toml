@@ -5,7 +5,3 @@ fetch.git = "https://github.com/y2q-actionman/cl-json-pointer"
 [termp]
 src.git = "https://github.com/vindarel/termp"
 fetch.git = "https://github.com/vindarel/termp"
-
-[lparallel]
-src.git = "https://github.com/sharplispers/lparallel"
-fetch.git = "https://github.com/sharplispers/lparallel"
